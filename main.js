@@ -5,34 +5,31 @@
 		var that = {},
 		configFile = 'log.config',
 		getDataLocation = function(){
-			//TODO unhardcode
 			return 'C:/Program Files (x86)/Hearthstone/Hearthstone_Data/output_log.txt';
 		},
 		getConfigLocation = function(){
-			//TODO osx
 			return process.env.LOCALAPPDATA+'/Blizzard/Hearthstone/'+configFile;
 		},
 		configExist = function(){
 			return fs.existsSync(getConfigLocation());
 		},
 		createConfig = function(callback){
-			//TODO 32bit && osx 
 			if (configExist()) return; 
-			fs.renameSync(
-				process.cwd()+'/'+configFile,
-				getConfigLocation()
-				);
+			fs.renameSync(process.cwd()+'/'+configFile, getConfigLocation());
 		},
-		parseEvents = function(){
-			alert('called');
+		parseEvents = function(line){
+			if (line.toLowerCase().indexOf('victory_screen_start')!==-1){
+				alert('yo win yourself a horse');
+			}
+			if (line.toLowerCase().indexOf('defeat_screen_start')!==-1){
+				alert('yo lost yo game');
+			}
+			console.log(line);
 		},
 		monitorChanges = function(){
-			fs.watchFile(getDataLocation(),parseEvents);
-			//here I need to detect when an arena
-			//pick event is happening 
-			//then store the pick till win/lose condition happens
+			var ft = require('file-tail').startTailing(getDataLocation());
+			ft.on('line',parseEvents);
 		}
-
 		;
 		that.monitorChanges = monitorChanges; 
 		that.createConfig = createConfig;
